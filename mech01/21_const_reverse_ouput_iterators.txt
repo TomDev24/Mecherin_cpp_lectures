@@ -98,19 +98,26 @@ std::conditional  since c++11
 private:
 template <bool IsConst>
 struct common_iterator{
-	char *ptr;
+	//can typdef std::conditional<..> here
+private:
+	using ConditionalPtr = std::conditional<IsConst, const T*, T*> 
+	using ConditionalRef = std::conditional<IsConst, const T&, T&> 
 
-	T* operator->(){
+	std::conditional<IsConst, const char*, char*> ptr;
+public:
+	std::conditional<IsConst, const T*, T*>  operator->(){
 		return ptr;
 	}
+	
+	//here also we need std::conditional
 	char& operator*(){
 		return *ptr;
 	}
-	iterator& operator+=(int n){
+	common_iterator<IsConst>& operator+=(int n){
 		ptr += n;
 		return *this;
 	}
-	iterator operator+(int n){
+	common_iterator<IsConst> operator+(int n){
 		auto copy = *this;
 		copy += n;
 		return copy;
@@ -128,6 +135,7 @@ struct conditional {
 	using type = V;
 } 
 
+!!!!!!!!!
 template <class U, class V>
 struct conditional<true, U, V>{
 	using type = U;
@@ -135,9 +143,16 @@ struct conditional<true, U, V>{
 
 template <bool B, class U, class V>
 using conditional_t = typename conditional<B, U, V>::type;
-//typedef also should work
+//typedef also should work probably
 
 
+vector<const int> does not matter which iterators we have
+we cant change values;
+
+
+4)Reverse iterator
+its separate class in standard library
+std::reverse_iterator
 
 
 
