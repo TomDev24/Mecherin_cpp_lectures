@@ -1,0 +1,13 @@
+https://www.youtube.com/watch?v=BZuzBPjDKuY&list=PL4_hYwCyhAvYTzwME4vQoDO8ZINM5trra&index=4
+
+primitive types dont have constructors
+but have type conversion, which implemented on low level
+
+1)Deque
+a) Array of pointers, b) on other arrays
+
+-No refrence invalidation
+-Do not move elements(memory cells)
+-But can invalidate iterators
+
+Exception safety

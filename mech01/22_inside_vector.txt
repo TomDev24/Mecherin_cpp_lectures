@@ -1,0 +1,189 @@
+https://www.youtube.com/watch?v=_wE7JYfcKN0&list=PL4_hYwCyhAvYTzwME4vQoDO8ZINM5trra&index=3
+
+1)Vector implementation
+!!naive way
+this implementaion will work
+only with classes/types which have default constructor!!!
+https://stackoverflow.com/questions/3575458/does-new-call-default-constructor-in-c
+
+template <typename T>
+class Vector{
+private:
+	T* arr;
+	size_t size; // elements inside vector
+	size_t capacity; //memory allocated
+
+	//size getter const 
+	//capacity getter const 	
+	
+	//take a look, here we need only to reserve memory
+	//but we user new T[n]
+	void reserve(size_t n){
+		if n <= capacity return;
+		  //bad version 1
+		  T *newarr = new T[n];
+		  //bad version 2
+		  T* newarr = reintepret_cast<T*>(new char[n * sizeof(T)]);
+		for i in range(size):
+			//be careful, we have uninit memory
+			//newarr[i] = arr[i]
+
+			//we need to create object at index(with copy constuctor)
+			new (newarr + i) T(arr[i]) //placement new -- (works since c++98)
+		delete [] arr; // can call destuctors of objects in list
+		//!!! but we can have in vector unintialize values so it will ERORR size < capacity!!!
+		for i in range(size)
+			(arr + i)->~T()			
+			arr[i].~T()
+		delete[] reintepret_cast<char*>(arr); // it wont call destuctors
+		arr = newarr
+		capacity = n;
+	}
+
+	//shrink_to_fit, free excess memory so capacity == size
+
+	//function signature is 100% correct
+	//sometis there is no default constructor, so you will have to specify value
+	//exception safety here also
+	void resize(size_t n, const T& value = T()){
+		if n > capacity reserve(n);
+		for i = size; i < n; i++
+			//here must be placement new
+			arr[i] = value;
+		if n < size
+			size = n;	
+	}
+	
+	//exception safety here also
+	void push_back(const T& value){
+		if (capacity == size)
+			reserve(size * 2)
+		//here must be placement new
+		new (arr + size) T(value);
+		arr[size] = value
+		size++;	
+	}
+	void pop_back(){
+		size--;
+		(arr + size)->~T();
+	}
+};
+
+//if we have not enough capacity, we multiply capacity by 2
+//and move elements into new memory block
+
+//placement new can ovveride object which were already there ( but without call of destructor)
+
+
+2)Fixing/Improving push_back
+//Mecherin says, that by how student implent this fuction, he can say how good he knows c++
+
+!!!STRONG EXCEPTION SAFETY must be GURANTEED in containers
+	if exception is thrown
+1)Base -- stays valid
+2)Strong -- stays unchagned 
+
+If inside any function of Vector, exception will be thrown, we do not finish our functions!!
+
+//Destructors should not throw EXCEPTIONS EVER!!!!!
+->so if object (in Vector) destructor throws exception inside vector method
+->we do nothing 
+
+YOU NEED TO ADD HERE THIS EXCEPTION GUARD HERE 
+https://stackoverflow.com/questions/36737602/why-three-points-in-catch-block-is-exist
+
+reserve{
+	size_t i = 0;
+	try{
+		for (; i < size; ++i)
+			new (newarr + i) T(arr[i]);
+	}
+	catch(...){
+		for (size_t j = 0; j < i; ++j
+			(newarr + i)->~T();	
+		delete[] reintepret_cast<char*>(newarr);
+		throw;
+	}
+}
+
+//this could be improved with
+
+try{
+	//We can pass pointers as iteratos (it will RAM iterators)
+	std::unintialized_copy(arr, arr + size, newarr);
+}
+catch(...){
+	delete[] reintepret_cast<char*>(newarr);
+	throw;
+} 
+
+3)
+https://en.cppreference.com/w/cpp/memory/uninitialized_copy
+(std::addressof(*current)))
+sometime & can be overloaded, so to get adress we can use adressof
+
+::new // is global new (rember it can be overloadded Class::new)
+
+4)Operator []
+
+T& operator[](size_t i){
+	return arr[i];
+} 
+
+const T& operator[](size_t i) const {
+	return arr[i];
+} 
+
+T& at(size_t i) {
+	if (i >= size)
+		throw std::out_of_range("...");
+	return arr[i];
+}
+
+new or malloc, is always heavy calls (os have to find where it can allocate memory)
+So its better do it ones, than many times
+
+
+
+5) vector<bool>
+//to make more effective
+//so each element takes one bit and not byte!!
+
+template <>
+class Vector<bool> {
+private:
+	char *arr;
+	struct BitReference{
+		char *bucket_ptr
+		uint8_t pos;	
+
+		//more about you can watch in video
+		return *this;
+	};
+public:
+
+	BitReference operator[](size_t i){
+		uint8_t pos = i % 8;	
+		uint8_t *ptr = arr + i / 8;
+		
+		return BitReference(ptr, pos);
+	}
+};
+
+Usual bool takes one byte; bool a = true;
+
+std::vector<bool> vb(10, false);
+vb[5] = true;
+
+how to check type of vb[5] ?
+class C{
+public:
+	template <class U>
+	C(const U&) = delete; 
+};
+
+C c(vb[5]) -> will error and tell type
+
+std::_Bit_reference -> intermediaate between Bool 1 byte and Bool 1 bit
+
+

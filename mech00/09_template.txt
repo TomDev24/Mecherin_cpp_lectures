@@ -1,0 +1,142 @@
+//SOMWHERE HERE ARE UNSECESARY & DELETE THEM!
+
+1)Class templates and function templates
+
+/- Template function
+template <typename T> // or <class T>
+void swap(T& a, T& b){}
+->
+call can be
+swap(2, 3)
+swap<int>(2, 3)
+
+/- Template class
+template <typename T>
+class A {}
+->
+A<int> a;
+
+
+2)Templates is another way of polymorhism
+virtual functions call correct base on type
+same with templates
+
+But virtual function - is dynamic polymorphism -> during runtime -> we chose which function to call
+Templates - static polymorhism -> during compilation -> check type and generates funtion/class with that type
+Function overloads is also polymorhishm
+
+3)Template specialization
+
+template <class T>
+void f(T &x);
+
+//this is specializtion
+template <> // can omit that line
+void f(int x);
+
+specialization (if matches) will be called first
+
+/-More complex example
+template <class T, class Z>
+void f(T &x, T &y);
+
+//specialized
+template<>
+void f(int x, int y);
+
+//less specialized
+template <class T>
+void f(int x, T &y);
+
+
+4)Aliases for types (typedef and using)
+
+typedef some_spacename::very_vey_long<int, vector<T>>::hah mytype;
+
+//how to also chose parameter T?? you cant do that in c++03!! only since c++11
+//since c++11 template typedef
+template <typename T>
+using mytype<T> = some_spacename::very_vey_long<int, vector<T>>::hah;
+
+
+5)Very useful thing (especially with iterators)
+template <typename T>
+class A {
+	typedef T type;
+}
+
+template <class T>
+inf f(){
+	//compile error
+	A<T>::type x;
+	//because compiler dont know  what is ::type
+	//is it member field or type(aka int, char etc)?
+	//by default compiler always thinks its field
+
+	//Template A<T> must be instatiated
+
+	//CORRECT!
+	typename A<T>::type x;
+	//forcing compiler to consdier ::type as type
+}
+
+
+6)Remove const, remove reference etc
+
+template <class T>
+struct remove_const{
+	typedef T type;
+}
+
+template <class T>
+struct remove_const<const T>{
+	typedef T type;
+}
+->
+//where T -> could be const T or just T
+typename remove_const<T>::type x;
+
+
+
+7)How does parameters get passed to Templates
+template <class T>
+void f( T &x); // & in main are ingnored and const will be saved
+
+int x; f(x) -> T=int , x=int&
+int &x; f(x) -> T=int , x=int& 
+const int x; f(x) -> T=const int ,  x = const int& 
+const int &x; f(x) -> T=const int , x = const int&
+
+-/Not refrence, byt passed by value
+template <class T>
+void f(T x); // & not saved, and const not saved
+
+int x; f(x) -> T=int , x=int
+int &x; f(x) -> T=int , x=int 
+const int x; f(x) -> T=int ,  x=int 
+const int &x; f(x) -> T=int , x=int
+
+
+8)non-type templates parameters
+//can be int/char/pointer
+template <class T, int n>
+...
+
+9)Template parameter in templates
+template <typename X,
+		template<typename> T>
+void f(const T<X> &T);
+
+T = array
+
+array<int> a;
+f<int, array>(a);
+
+9)Templates parameters can take default values
+template<typename X = int>
+
+In C++11 templates can have varying amount of parameters
+//like va_arg for function parameters in C
+->
+now we can easily implement fuctions with varying amount of parameters with diffrent type
+

@@ -1,0 +1,168 @@
+https://www.youtube.com/watch?v=EJQ9PMSrmTA&list=PL4_hYwCyhAvYTzwME4vQoDO8ZINM5trra&index=2
+
+1)Basic idea, Iterator invalidation
+	
+//interatros may be inccorect after operations on container - container invalidation
+refrence - pointer on element in container
+
+	iterator invalidation		refrence invalidation
+vector		x				x
+deque		x(reallocation)			v	
+list		v				v
+map		v				v
+unordered_map   x(rehash)			v
+
+
+2)
+deque
+i	j(index of fixed size array) (this arrays do not reallocate)
+----------------
+->	[    ]
+->	[    ]
+->	[    ]
+->	[    ]
+->	[    ]
+
+iterator works on (i, j)
+
+when reallocation happen (of ->) i can point to diffrent place
+but &(i, j) will point to valid memory
+
+
+
+3)Types/Hierarchy of iterators (Input iterator, Output iterator)
+//the lower elements inherits upper elements quailities
+
+InputIterator   | *it , ++it, it1 == it2  | Iterator одного прохода | Input - итератор на входные данные
+      |
+ForwardIterator | Same as InputIterator | Можно несколько раз проходить | Can be used instead of InputIterator
+      |
+BidirectionalIterator | --it 
+      |
+RandomAccessIterator  | <, >, <=, >=, +=n , -=n, it2-it1 (behaves like pointer) | but no !! it2+it1 
+      |
+ContiguonsIterator    | since c++17 | Memory cell goes on after another, really are pointers
+
+
+*If you copy input iterator and increment it by one, it wil be undefined behavior
+
+*Iterators do not say anything of complexity, same calls to diff vectors, can have diff complexity
+
+//gurantees that find only do *(разыменование) and increment(++)
+//and that it wont go over container twice
+std::find(InputIterator first, InputIterator last, const T& x);
+
+forward_list, unordered_map -> ForwardIterator
+double_list, set, map -> BidirectionalIterator
+vector, deque -> RandomAccessIterator
+vector -> ContiguonsIterator
+
+
+4)Functions of std:: on iterators
+std::advance since c++98
+std::next since c++11;
+std::is_same since c++11;
+std::is_same_v since c++17;
+
+{
+std::set<int> s;
+//fill cells
+std::set<int>::iterator it = s.begin(); // just begin() exists since c++98
+std::cout << *it; //first element; 
+std::advance(it, 25); // move iterator forward by 25
+std::cout << *it; //25th element; 
+std::advance(it, -10); //bidirectional so its possible
+//be carefull, compiler wont catch that error -> will be undefined behavior
+//so you think which iterator, and what can you do with it
+
+//std::cout << *(it + 1); //Error set has BiIt not RamIt
+
+}
+
+
+
+5)How to make std::advance behavior work one way for one iterators and diffrent way for others
+
+//better probably to call InputIterator
+template <class Iterator>
+void my_advance(Iterator& iter, int n){
+	//we cannot do usual if else with data type eg if int then..
+	//cannot use == 
+	if (std::is_same_v<
+		typename std::iterator_traits<Iterator>::iterator_catergory,
+		std::random_access_iterator_tag
+	>)
+		iter += n; //!!! compiler compiles all lines!
+		//! some iterartor do not support this operation, compiler will ERROR
+		//#c++17 can write if constexpr -> compile time check
+		//in earliear vesion we can use template specialization 7)
+	else
+		for i in range n;
+			iter++;
+}
+
+
+
+*In standard library we have std::iterator_traits<iterator>
+template <class T>
+struct iterator_traits{
+	using value_type = .....;
+	typedef ....... iterator_catergory
+}
+std::iterator_traits<iterator>::value_type
+std::iterator_traits<iterator>::iterator_catergory / check next point 6)
+
+*how do we find out iterator_catergory ??? we will find out later
+
+
+6)Iterator category
+!!! They are really empty
+struct input_iterator_tag{};
+struct forward_iterator_tag : public input_iterator_tag {};
+
+
+
+7)
+by the way we dont need &IterCategory
+cause it is empty struct {}( 1 byte) which is less than adress(8 byte)
+
+//we can omit variable name, if we do not use in function
+template <class Iterator, class IterCategory>
+void my_advance_helper(Iterator &iter, int n, IterCategory){
+	for i in range n;
+		iter++;
+} 
+
+template <class Iterator>
+void my_advance_helper(Iterator &iter, int n, std::random_access_iterator_tag){
+	iter += n; 
+}
+
+//if c++20 !! not c++17
+template <class Iterator>
+void my_advance_helper(Iterator &iter, int n, std::contiguons_iterator_tag){
+	iter += n; 
+}
+
+template <class Iterator>
+void my_advance(Iterator& iter, int n){
+	my_advance_helper(iter, n,
+		std::iterator_traits<Iterator>::iterator_catergory())
+		//typename std::iterator_traits<Iterator>::iterator_catergory)
+}
+
+
+*Template specialization <> vs Template overload <....>(it is diffrent thing !!!)
+
+
+8)std::distance
+//goes from first to last!!!!
+distance( InputIt first, InputIt last );
+Returns the number of hops from first to last.
+
+The behavior is undefined if last is not reachable from first by (possibly repeatedly) incrementing first.
+but for RamIterator should work fine
+
+
+*iterator_category in iterator traits will determine your iterator!!!
+try to write your own iterator

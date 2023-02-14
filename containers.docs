@@ -1,0 +1,40 @@
+Мещерин C++
+cpp reference
+
+Allocator<T>(memory manager)
+	-allocate(size_t n) // alloc memset(0)
+	-dealocate(T *ptr, size_t n)
+	-construct(T *ptr, const T& val) // 
+	-destroy(T *ptr)
+
+int *a;
+std::allocator<int> alloc;
+
+a = alloc.allocate(2);
+
+alloc.construct(a[0], 1); //should be &a[0]
+alloc.destroy(&a[0]) // calling desctuctor of object (but memory cell is still available)
+
+alloc.dealocate(a, 2);
+
+
+in cpprefrence check Member Types, Member Functions, Non Member Funcions
+Member Types typedefined values
+std::vector<T, Allocator<T> = std::allocator<T>> // because of default value its why you only were passing T
+	capacity // how much allocated
+	size
+	T* ptr
+
+when size == capacity -> capacity * 2; copy from T* to T1*; dealocate T*	
+
+
+vector<T> map, stack and so on, requires that T have copy consturctor and copy assignment
+or should have only copy constuctor?? 
+
+//It is not just about containers, but the whole C++
+Гарантия безопасноти исключения
+1)Base - turn object in valid state(any way)
+2)Strict
+3)No exception
+
+What if exception will happen? We need to always think about that

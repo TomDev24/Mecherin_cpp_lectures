@@ -1,0 +1,145 @@
+https://www.youtube.com/watch?v=YrL_bjontmQ&list=PL4_hYwCyhAvYTzwME4vQoDO8ZINM5trra&index=2
+
+1)Const and reverse iterator
+
+const iterator does not allow assigment to *it(will be const refrence)§
+
+class String{
+	int sz;
+	char *str;
+public:
+	struct iterator{
+		
+	};	
+};
+
+
+virtual function is not so good
+that way iterators do not use polymophism(virtual functions)
+
+iterators must be fast
+every call to virt.funtion goes to virtual table and it takes time
+
+
+by the way, iterator_traits will correclty identify pointers
+
+/* In Java everything is virtual ?? */
+
+*)If we talking about polymophism there it two ways:
+1)to do everything through inheritance -> fast compile and slower execution
+2)or through templates -> slow compile and fast execution
+
+
+return to 1)
+
+do we need to support
+5 + iterator
+anwser is yes
+->Then we have to define it 
+
+class String{
+	int sz;
+	char *str;
+public:
+	struct iterator{
+		char *ptr;
+
+------------------------
+		//by the way
+		//by standard,  this operator should return c style pointer
+		//compiler will then add additional ->
+		T* operator->(){
+			return ptr;
+		}
+
+		//this operator have to deal, with user defined pointers to class fields
+		//Can return anything, nothing special
+----Not sure about this one
+		template <class U>
+		U& operator->*(U T::*p){
+			return (*ptr).*p
+		}
+pointer to class variable and method are difrrent!
+------------------------
+		
+		char& operator*(){
+			return *ptr;
+		}
+		iterator& operator+=(int n){
+			ptr += n;
+			return *this;
+		}
+		iterator operator+(int n){
+			auto copy = *this;
+			copy += n;
+			return copy;
+		}
+	};	
+};
+
+String::iterator operator+(int n, const String::iterator& iter){
+	return iter + n; // here Sting::operator+ will work, where n + iter dont call this function
+} 
+
+////////////
+struct S{
+	int a;
+}
+
+int S::* ptr = S::a;
+S s;
+s.*ptr = 1;
+///////////
+
+
+2)Const iterators
+std::conditional  since c++11
+//BY THE WAY type alias with using name = ...., can be done only since c++11
+private:
+template <bool IsConst>
+struct common_iterator{
+	char *ptr;
+
+	T* operator->(){
+		return ptr;
+	}
+	char& operator*(){
+		return *ptr;
+	}
+	iterator& operator+=(int n){
+		ptr += n;
+		return *this;
+	}
+	iterator operator+(int n){
+		auto copy = *this;
+		copy += n;
+		return copy;
+	}
+};
+
+public:
+	using iterator = common_iterator<false>
+	using const_iterator = common_iterator<true>
+
+3)std::conditional implementation
+
+template <bool B, class U, class V>
+struct conditional {
+	using type = V;
+} 
+
+template <class U, class V>
+struct conditional<true, U, V>{
+	using type = U;
+}
+
+template <bool B, class U, class V>
+using conditional_t = typename conditional<B, U, V>::type;
+//typedef also should work
+
+
+
+
+
+
+

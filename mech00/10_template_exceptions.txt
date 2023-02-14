@@ -1,0 +1,43 @@
+*)Note About previous lection
+
+template <typename T> // or <class T>
+void swap(T& a, T& b){}
+->
+call can be
+swap(2, 3) // wont work we need pass l-values(variables!!) 
+
+-------------------------
+
+
+1)Variadic template (since C++11)
+
+template <typename ... Args>
+void f(Args ... args);
+
+
+template <typename Head, typename ... Tail>
+void f(Head x, Tail ... t){
+	std::cout << x;
+	f(t);
+}
+//we need to handle case when nothing left separetly
+void f(){};
+
+sizeof ...(t) -> to get number of elements
+if sizeof ...(t) > 0 then f(t)
+
+! V.T. least specialized template! 
+
+-/We can get refrence
+template <typename Head, typename ... Tail>
+void f(Head &x, Tail &... t) // &... -> every element from list is refrence
+
+C<Tail>... // list of C instances 
+
+2)std::pair -> std::tuple (can more than two types)
+tuple<int, double, std::string>
+
+
+************
+
+2)Abstract sort, with compare function pointer
