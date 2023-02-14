@@ -1,0 +1,101 @@
+1)Types and modificators
+int x = 5;
+int &z = x;
+const int &t = x;
+
+cant change value with &t;
+
+!!!interestin example
+//we can do that
+const int &t = 5; // we can init const refrences with values
+//but we cant do it like that:
+int &t = 5;
+
+
+2)Most scary thing is undefineg behavior(compilator can erase hard drive))
+//he says its hard to debug
+//but compile gives warning
+//i need to be carefull
+int& f(int x){
+   int y = x + 1;
+   return y;
+}
+
+3)Type conversion (static_cast!, reintepret_cast, const_cast, dynamic_cast) 
+
+static_cast is most used // name is static, because on step of compilation we will know is it possible to convert
+compiler will try to convert in any possible way
+if cant, then compile error
+
+reintepret_cast - those bytes in memory, save it, but intepret it as diffrent data type
+->change one type of pointer to other -> reintepret_cast<void*>(&char)
+undefined behavior (if diffrent sizes)
+
+const_cast - undo const, and add const
+const int &t = x;
+const_cast<int&>(x);// its okay;
+const int x = 5; // its undefined behavior if we use it on that
+
+-----
+f(const int&)
+f(int &)
+--->this is two diffrent function types (overload)
+
+//const_cast<const int&>(x); correct
+
+dynamic_cast - will be discussed later
+
+
+c-style cast is most strong cast(can do anything)
+static_cast - most soft cast
+
+try to avoid type converison!!
+
+4)OOP intro // ADT - Abstract Data Type
+-Classes and structures
+
+Why we need ; after class
+class {...} x; // type declaration
+
+in struct every field public by default, contrary in class
+
+
+5)Constructor, destructor, operator=
+6)Class String implementation
+String(const char *str);
+String(const char *str_, int size_){
+	str = new char[size_]; 
+}
+
+String name = "haha"; // valid, constuctor is called
+String last_name = String("Moba", 4); also valid
+
+/--
+You can even omit constuctors, and do not write them
+then "String s;" compiler will try to generate default constructor
+meaning it will init every field with default value
+if it cant generate default value(for ex its const int value) for field -> ERROR
+
+since c++11, we can set default values explicitly like
+class {
+	int x = 3;
+}
+
+//if you have at least one constuctor, compiler wont generate default one
+//but, since c++11 you can do in class definition ex: String() = default;
+
+String() = delete; //do not generate default contructor
+
+7)Destructor
+Destruct object -> then dectructs fields and so on
+If no dectructor declared, its generated automaitcly(which calls default destuctors of fields)
+
+8)Copy constructor 
+String s1 = s; or String s1(s);
+//can also be generated automaticly (only those two constuctors can be generated automaticly)
+String(String other) // infinite calls of copy constructor (cause we pass by copy)
+String(const String &other)
+
+//we can use = default and = delete on it
+
+

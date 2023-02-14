@@ -1,0 +1,164 @@
+1)If you have memory allocated -> call delete in destructor
+->that means you have to implement(or think about), copy constuctor and assigment operator
+->so you can let default constructor handle that
+
+
+2)Operators . and -> and keyword this
+(*p).f() or p->f();
+
+for (int i = 5; i--> 0;)
+
+-/compiler could also generate asigment operator
+String s1 = 'ha';
+String s = s1; // failure if no operator=()
+
+3)Assigment operator
+//correct memory allocation, so they wont point on same thing
+String& operator=(const String &other){
+	delete[] str;
+	str = new char[other.size];
+	for(){};
+	return *this;
+}
+
+x=y=5;
+1)y = 5;
+2)x = y;
+
+
+String s1 = 'ha';
+s1 = s1; // very bad, we will lost data, undefined
+{
+	if this == &other
+		return *this;
+}
+
+4)Rule of three (until c++11, c++11 have rule of 5)
+If you have to implement at least something from list (destructor, copy constuctor, assigment operator)
+then you need everything from the list
+
+5)list initialization of constuctor
+
+class C{
+	const int x = 5;
+	int &y;	
+	C(const int x_, int &y_){
+		//as we enter the constuctor, field values are initialized
+		//so we cant change them;
+	};
+	
+	C(const int x, int &y) : x(x), y(y) {} // list initialization
+	// especially its useful for class object initialization!!
+};
+
+//its better to use list initialization
+
+6)Keyword explicit (for constructros since c++98)
+implicit - hidden
+->Create constructor String(int x); -> allocate x bytes;
+String s = s1 + 'a'; // + for String + char is not defined
+or 
+String s = 'a'; -> char will be converted to int
+---> this is the reason why may want to restrict hidden type converison
+//but we can do String + String
+explicit String(int x); // only int type will work
+String s = 5; /error |||| String(5) correct
+
+
+7) const methods // IT IS VERY IMPORTANT!!
+if you know that method does not change object, make it const
+const String s = "abc";
+s.size() // gettter
+->ERROR
+By default every method able to change fields of class(object)
+on const object, we can only call const methods !!
+void f(void) const {};
+
+
+8)What if we have exceptional case when inside const fuction, we need to change class field?
+--------->Keyword mutable (since c++98)
+class {
+	mutable int x;   // can be chaned inside const method
+}
+
+9)Friend fuctions (which have access to private part of class)
+Inside class, we can declare only those operations where on the left side of operand is class object
+eg class_obj */+0 something
+
+class {
+	friend void f();
+}
+
+void f();
+
+//Do not make a lot of friends // breaking incapsulation
+//As little as possible
+friend is something as type casting
+
+Class too can be friends
+
+
+
+10)What if we have similiar constuctors and we dont want to repeat ourself
+class A{
+	A(int, char*);
+	A(char*, int); // both identical contructors
+}
+Until c++11 you had to repeat yourself in those cases;
+
+//Delegate constructor (call another constuctor before this one)
+A(int num, char* text) : A(text, num) {}; 
+
+
+11)Keyword static -- class variables
+its visible inside every object (if its public, then everywhere)
+class {
+	static int x;
+}
+by the way static variable can be inside fuctions(variable wont be erased)
+
+dynamic memory , stack memory, static memory
+
+
+12) Pointers on filed, functions inside class (operators .* and ->*)
+class C{
+public:
+	int a;
+	char b;
+}
+
+int main{
+	int C::* ptr = C::a;
+
+	C c;
+	c.*ptr = 10;
+	//c->*ptr = 10; for c pointer
+}
+
+
+13)Operator overload
+
+-/Arithmetic operators
+class BigInteger{
+	BigInteger  operator+(const BigInteger &x) const {
+		BigInteger sum = *this;
+		return sum += x;	
+	}
+	BigInteger& operator+=(const BigInteger &x) {
+		//if we have assigment operator and operator+ defined
+		//this will work, but it will take long time
+		//calss copy constuctor, thern assigment operator
+		return *this = *this + x; // wrong implementation!!
+	}
+};
+
+
+ClassA fun(){
+    ClassA a;
+    a.set(...);
+    return a;
+}
+Which effectively call the copy constructor on the return value
+https://stackoverflow.com/questions/41910764/where-is-the-return-object-stored
+
+
