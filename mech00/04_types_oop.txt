@@ -59,7 +59,6 @@ class {...} x; // type declaration
 
 in struct every field public by default, contrary in class
 
-
 5)Constructor, destructor, operator=
 6)Class String implementation
 String(const char *str);

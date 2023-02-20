@@ -2,11 +2,10 @@
 ->that means you have to implement(or think about), copy constuctor and assigment operator
 ->so you can let default constructor handle that
 
-
 2)Operators . and -> and keyword this
 (*p).f() or p->f();
 
-for (int i = 5; i--> 0;)
+for (int i = 5; i--; i > 0;)
 
 -/compiler could also generate asigment operator
 String s1 = 'ha';
@@ -21,6 +20,8 @@ String& operator=(const String &other){
 	return *this;
 }
 
+#Thanks, to this design of operator=() below code will work
+#Seems like reading line from right to left
 x=y=5;
 1)y = 5;
 2)x = y;
@@ -29,7 +30,7 @@ x=y=5;
 String s1 = 'ha';
 s1 = s1; // very bad, we will lost data, undefined
 {
-	if this == &other
+	if this == &other // comparing adresses
 		return *this;
 }
 
@@ -48,10 +49,11 @@ class C{
 	};
 	
 	C(const int x, int &y) : x(x), y(y) {} // list initialization
+	//yes! we can have same names!
 	// especially its useful for class object initialization!!
 };
 
-//its better to use list initialization
+//its better to use list initialization always
 
 6)Keyword explicit (for constructros since c++98)
 implicit - hidden
@@ -82,8 +84,8 @@ class {
 }
 
 9)Friend fuctions (which have access to private part of class)
-Inside class, we can declare only those operations where on the left side of operand is class object
-eg class_obj */+0 something
+!!Inside class, we can declare only those operations where on the left side of operand is class object
+eg class_obj */+- something
 
 class {
 	friend void f();
@@ -96,8 +98,6 @@ void f();
 friend is something as type casting
 
 Class too can be friends
-
-
 
 10)What if we have similiar constuctors and we dont want to repeat ourself
 class A{
@@ -118,7 +118,6 @@ class {
 by the way static variable can be inside fuctions(variable wont be erased)
 
 dynamic memory , stack memory, static memory
-
 
 12) Pointers on filed, functions inside class (operators .* and ->*)
 class C{
